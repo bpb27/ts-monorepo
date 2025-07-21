@@ -1,0 +1,47 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "User Service API",
+    "description": "User Service API",
+    "version": "1.0.0"
+  },
+  "components": { "schemas": {} },
+  "paths": {
+    "/hello/{languageCode}": {
+      "get": {
+        "operationId": "sayHello",
+        "tags": ["greetings"],
+        "description": "Says hello in 3 languages",
+        "parameters": [
+          {
+            "schema": { "type": "string", "minLength": 1 },
+            "in": "query",
+            "name": "name",
+            "required": true
+          },
+          {
+            "schema": { "type": "string", "enum": ["en", "fr", "es", "ge"] },
+            "in": "path",
+            "name": "languageCode",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

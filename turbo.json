@@ -1,0 +1,34 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "codegen": {
+      "outputs": [],
+      "dependsOn": ["^codegen"]
+    },
+    "codegen:user-service": {
+      "outputs": ["api-spec.json"]
+    },
+    "codegen:api-client-user-service": {
+      "dependsOn": ["@repo/user-service#codegen"],
+      "inputs": ["../../apps/user-service/api-spec.json"],
+      "outputs": ["src/generated-api-client.ts"]
+    },
+    "build": {
+      "dependsOn": ["^build", "^codegen"],
+      "inputs": ["$TURBO_DEFAULTS", ".env*"],
+      "outputs": ["dist/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint", "^codegen"]
+    },
+    "test": {
+      "dependsOn": ["^test", "^codegen"]
+    },
+    "dev": {
+      "dependsOn": ["^codegen"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

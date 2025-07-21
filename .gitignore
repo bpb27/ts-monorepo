@@ -1,0 +1,10 @@
+.DS_Store
+.turbo
+*.pem
+dist
+node_modules
+pnpm-debug.log*
+*storybook.log
+storybook-static
+.env
+.env.local

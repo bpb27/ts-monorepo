@@ -1,18 +1,16 @@
 import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { getSession } from '../../utils/requests.js';
 
-export const setupRoutes = (fastify: FastifyInstance) => {
+export const setupAuthedRoutes = (fastify: FastifyInstance) => {
   fastify.withTypeProvider<ZodTypeProvider>().route({
     method: 'GET',
-    url: '/hello/:languageCode',
+    url: '/hello-user/:languageCode',
     schema: {
-      operationId: 'sayHello',
-      description: 'Says hello in 3 languages',
+      operationId: 'sayHelloUser',
+      description: 'Says hello in multiple languages',
       tags: ['greetings'],
-      querystring: z.object({
-        name: z.string().min(1),
-      }),
       params: z.object({
         languageCode: z.enum(['en', 'fr', 'es', 'ge']),
       }),
@@ -22,15 +20,16 @@ export const setupRoutes = (fastify: FastifyInstance) => {
         }),
       },
     },
-    handler: (req, res) => {
+    handler: async (request, reply) => {
+      const session = await getSession(request);
       const greeting = {
-        ge: 'Guten Tag',
+        ge: 'Gutentag',
         ja: 'Konichiwa',
         en: 'Hello',
         fr: 'Bonjour',
         es: 'Hola',
-      }[req.params.languageCode];
-      res.send({ message: `${greeting}, ${req.query.name}` });
+      }[request.params.languageCode];
+      reply.send({ message: `${greeting}, ${session.user.name}` });
     },
   });
 };

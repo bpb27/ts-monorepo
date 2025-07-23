@@ -19,6 +19,10 @@ import type {
 } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
 
+export type SayHelloUser200 = {
+  message: string;
+};
+
 export type SayHelloParams = {
   /**
    * @minLength 1
@@ -33,6 +37,176 @@ export type SayHello200 = {
 type AwaitedInput<T> = PromiseLike<T> | T;
 
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+
+/**
+ * Says hello in multiple languages
+ */
+export type sayHelloUserResponse200 = {
+  data: SayHelloUser200;
+  status: 200;
+};
+
+export type sayHelloUserResponseComposite = sayHelloUserResponse200;
+
+export type sayHelloUserResponse = sayHelloUserResponseComposite & {
+  headers: Headers;
+};
+
+export const getSayHelloUserUrl = (languageCode: 'en' | 'fr' | 'es' | 'ge') => {
+  return `http://localhost:3000/hello-user/${languageCode}`;
+};
+
+export const sayHelloUser = async (
+  languageCode: 'en' | 'fr' | 'es' | 'ge',
+  options?: RequestInit
+): Promise<sayHelloUserResponse> => {
+  const res = await fetch(getSayHelloUserUrl(languageCode), {
+    ...options,
+    method: 'GET',
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  const data: sayHelloUserResponse['data'] = body ? JSON.parse(body) : {};
+
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as sayHelloUserResponse;
+};
+
+export const getSayHelloUserQueryKey = (
+  languageCode: 'en' | 'fr' | 'es' | 'ge'
+) => {
+  return [`http://localhost:3000/hello-user/${languageCode}`] as const;
+};
+
+export const getSayHelloUserQueryOptions = <
+  TData = Awaited<ReturnType<typeof sayHelloUser>>,
+  TError = unknown,
+>(
+  languageCode: 'en' | 'fr' | 'es' | 'ge',
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof sayHelloUser>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  }
+) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getSayHelloUserQueryKey(languageCode);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof sayHelloUser>>> = ({
+    signal,
+  }) => sayHelloUser(languageCode, { signal, ...fetchOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!languageCode,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof sayHelloUser>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type SayHelloUserQueryResult = NonNullable<
+  Awaited<ReturnType<typeof sayHelloUser>>
+>;
+export type SayHelloUserQueryError = unknown;
+
+export function useSayHelloUser<
+  TData = Awaited<ReturnType<typeof sayHelloUser>>,
+  TError = unknown,
+>(
+  languageCode: 'en' | 'fr' | 'es' | 'ge',
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof sayHelloUser>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sayHelloUser>>,
+          TError,
+          Awaited<ReturnType<typeof sayHelloUser>>
+        >,
+        'initialData'
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useSayHelloUser<
+  TData = Awaited<ReturnType<typeof sayHelloUser>>,
+  TError = unknown,
+>(
+  languageCode: 'en' | 'fr' | 'es' | 'ge',
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof sayHelloUser>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof sayHelloUser>>,
+          TError,
+          Awaited<ReturnType<typeof sayHelloUser>>
+        >,
+        'initialData'
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useSayHelloUser<
+  TData = Awaited<ReturnType<typeof sayHelloUser>>,
+  TError = unknown,
+>(
+  languageCode: 'en' | 'fr' | 'es' | 'ge',
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof sayHelloUser>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useSayHelloUser<
+  TData = Awaited<ReturnType<typeof sayHelloUser>>,
+  TError = unknown,
+>(
+  languageCode: 'en' | 'fr' | 'es' | 'ge',
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof sayHelloUser>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getSayHelloUserQueryOptions(languageCode, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 /**
  * Says hello in 3 languages

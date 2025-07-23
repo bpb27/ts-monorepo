@@ -7,6 +7,36 @@
   },
   "components": { "schemas": {} },
   "paths": {
+    "/hello-user/{languageCode}": {
+      "get": {
+        "operationId": "sayHelloUser",
+        "tags": ["greetings"],
+        "description": "Says hello in multiple languages",
+        "parameters": [
+          {
+            "schema": { "type": "string", "enum": ["en", "fr", "es", "ge"] },
+            "in": "path",
+            "name": "languageCode",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "message": { "type": "string" } },
+                  "required": ["message"],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/hello/{languageCode}": {
       "get": {
         "operationId": "sayHello",

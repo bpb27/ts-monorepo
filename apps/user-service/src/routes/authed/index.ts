@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { db } from '../../database.js';
 import { getSession } from '../../utils/requests.js';
 
 export const setupAuthedRoutes = (fastify: FastifyInstance) => {
@@ -30,6 +31,31 @@ export const setupAuthedRoutes = (fastify: FastifyInstance) => {
         es: 'Hola',
       }[request.params.languageCode];
       reply.send({ message: `${greeting}, ${session.user.name}` });
+    },
+  });
+
+  fastify.withTypeProvider<ZodTypeProvider>().route({
+    method: 'GET',
+    url: '/users',
+    schema: {
+      operationId: 'getUsers',
+      description: 'Get users',
+      tags: ['users'],
+      response: {
+        200: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+          })
+          .array(),
+      },
+    },
+    handler: async (_request, reply) => {
+      const result = await db
+        .selectFrom('user')
+        .select(['id', 'name'])
+        .execute();
+      reply.send(result);
     },
   });
 };

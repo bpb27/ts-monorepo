@@ -2,21 +2,20 @@ import { useState } from 'react';
 import viteLogo from '/vite.svg';
 import reactLogo from './assets/react.svg';
 import './intro.css';
-import { useSayHello } from '@repo/api-client-user-service';
+import { useGetUsers, useSayHelloUser } from '@repo/api-client-user-service';
 import { Button, css } from '@repo/ui';
 import { authClient } from './auth';
 
 export function Intro() {
   const [count, setCount] = useState(0);
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
+  const { data: users } = useGetUsers({
+    query: { enabled: !!session },
+  });
 
-  const { data } = useSayHello(
-    'ge',
-    { name: session?.user?.name || '' },
-    {
-      query: { enabled: !!session },
-    }
-  );
+  const { data: greeting } = useSayHelloUser('en', {
+    query: { enabled: !!session },
+  });
 
   return (
     <>
@@ -39,7 +38,7 @@ export function Intro() {
         <button onClick={() => setCount((prev) => prev + 1)} type="button">
           count is {count}
         </button>
-        {!!data?.data?.message && <Button>{data?.data?.message}</Button>}
+        {!!greeting && <Button>{greeting?.message}</Button>}
         {!!session && (
           <button
             onClick={() => {
@@ -50,7 +49,7 @@ export function Intro() {
             Sign out
           </button>
         )}
-        {!session && (
+        {!(session || isPending) && (
           <div>
             <div
               className={css({ margin: 'large', padding: 'large' })}
@@ -104,6 +103,11 @@ export function Intro() {
             </div>
           </div>
         )}
+        <div>
+          <h1>Users</h1>
+          {Array.isArray(users) &&
+            users.map((user) => <div key={user.id}>{user.name}</div>)}
+        </div>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>

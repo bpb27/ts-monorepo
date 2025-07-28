@@ -19,8 +19,14 @@ import type {
 } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
 
+import { customFetch } from './custom-fetch';
 export type SayHelloUser200 = {
   message: string;
+};
+
+export type GetUsers200Item = {
+  id: string;
+  name: string;
 };
 
 export type SayHelloParams = {
@@ -38,41 +44,23 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
 /**
  * Says hello in multiple languages
  */
-export type sayHelloUserResponse200 = {
-  data: SayHelloUser200;
-  status: 200;
-};
-
-export type sayHelloUserResponseComposite = sayHelloUserResponse200;
-
-export type sayHelloUserResponse = sayHelloUserResponseComposite & {
-  headers: Headers;
-};
-
 export const getSayHelloUserUrl = (languageCode: 'en' | 'fr' | 'es' | 'ge') => {
   return `http://localhost:3000/hello-user/${languageCode}`;
 };
 
-export const sayHelloUser = async (
+export const sayHelloUser = (
   languageCode: 'en' | 'fr' | 'es' | 'ge',
   options?: RequestInit
-): Promise<sayHelloUserResponse> => {
-  const res = await fetch(getSayHelloUserUrl(languageCode), {
+): Promise<SayHelloUser200> => {
+  return customFetch<SayHelloUser200>(getSayHelloUserUrl(languageCode), {
     ...options,
     method: 'GET',
   });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  const data: sayHelloUserResponse['data'] = body ? JSON.parse(body) : {};
-
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as sayHelloUserResponse;
 };
 
 export const getSayHelloUserQueryKey = (
@@ -90,17 +78,17 @@ export const getSayHelloUserQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof sayHelloUser>>, TError, TData>
     >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   }
 ) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey =
     queryOptions?.queryKey ?? getSayHelloUserQueryKey(languageCode);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof sayHelloUser>>> = ({
     signal,
-  }) => sayHelloUser(languageCode, { signal, ...fetchOptions });
+  }) => sayHelloUser(languageCode, { signal, ...requestOptions });
 
   return {
     queryKey,
@@ -111,7 +99,9 @@ export const getSayHelloUserQueryOptions = <
     Awaited<ReturnType<typeof sayHelloUser>>,
     TError,
     TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  > & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 };
 
 export type SayHelloUserQueryResult = NonNullable<
@@ -136,7 +126,7 @@ export function useSayHelloUser<
         >,
         'initialData'
       >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -159,7 +149,7 @@ export function useSayHelloUser<
         >,
         'initialData'
       >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -174,7 +164,7 @@ export function useSayHelloUser<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof sayHelloUser>>, TError, TData>
     >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -190,7 +180,7 @@ export function useSayHelloUser<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof sayHelloUser>>, TError, TData>
     >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -201,7 +191,143 @@ export function useSayHelloUser<
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
     TError
+  > & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Get users
+ */
+export const getGetUsersUrl = () => {
+  return 'http://localhost:3000/users';
+};
+
+export const getUsers = (options?: RequestInit): Promise<GetUsers200Item[]> => {
+  return customFetch<GetUsers200Item[]>(getGetUsersUrl(), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getGetUsersQueryKey = () => {
+  return ['http://localhost:3000/users'] as const;
+};
+
+export const getGetUsersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUsers>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetUsersQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsers>>> = ({
+    signal,
+  }) => getUsers({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getUsers>>,
+    TError,
+    TData
   > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetUsersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUsers>>
+>;
+export type GetUsersQueryError = unknown;
+
+export function useGetUsers<
+  TData = Awaited<ReturnType<typeof getUsers>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUsers>>,
+          TError,
+          Awaited<ReturnType<typeof getUsers>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUsers<
+  TData = Awaited<ReturnType<typeof getUsers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUsers>>,
+          TError,
+          Awaited<ReturnType<typeof getUsers>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUsers<
+  TData = Awaited<ReturnType<typeof getUsers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetUsers<
+  TData = Awaited<ReturnType<typeof getUsers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetUsersQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
   query.queryKey = queryOptions.queryKey;
 
@@ -211,17 +337,6 @@ export function useSayHelloUser<
 /**
  * Says hello in 3 languages
  */
-export type sayHelloResponse200 = {
-  data: SayHello200;
-  status: 200;
-};
-
-export type sayHelloResponseComposite = sayHelloResponse200;
-
-export type sayHelloResponse = sayHelloResponseComposite & {
-  headers: Headers;
-};
-
 export const getSayHelloUrl = (
   languageCode: 'en' | 'fr' | 'es' | 'ge',
   params: SayHelloParams
@@ -241,20 +356,15 @@ export const getSayHelloUrl = (
     : `http://localhost:3000/hello/${languageCode}`;
 };
 
-export const sayHello = async (
+export const sayHello = (
   languageCode: 'en' | 'fr' | 'es' | 'ge',
   params: SayHelloParams,
   options?: RequestInit
-): Promise<sayHelloResponse> => {
-  const res = await fetch(getSayHelloUrl(languageCode, params), {
+): Promise<SayHello200> => {
+  return customFetch<SayHello200>(getSayHelloUrl(languageCode, params), {
     ...options,
     method: 'GET',
   });
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-  const data: sayHelloResponse['data'] = body ? JSON.parse(body) : {};
-
-  return { data, status: res.status, headers: res.headers } as sayHelloResponse;
 };
 
 export const getSayHelloQueryKey = (
@@ -277,17 +387,17 @@ export const getSayHelloQueryOptions = <
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof sayHello>>, TError, TData>
     >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   }
 ) => {
-  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
   const queryKey =
     queryOptions?.queryKey ?? getSayHelloQueryKey(languageCode, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof sayHello>>> = ({
     signal,
-  }) => sayHello(languageCode, params, { signal, ...fetchOptions });
+  }) => sayHello(languageCode, params, { signal, ...requestOptions });
 
   return {
     queryKey,
@@ -322,7 +432,7 @@ export function useSayHello<
         >,
         'initialData'
       >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & {
@@ -346,7 +456,7 @@ export function useSayHello<
         >,
         'initialData'
       >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -362,7 +472,7 @@ export function useSayHello<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof sayHello>>, TError, TData>
     >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -379,7 +489,7 @@ export function useSayHello<
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof sayHello>>, TError, TData>
     >;
-    fetch?: RequestInit;
+    request?: SecondParameter<typeof customFetch>;
   },
   queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & {
@@ -390,7 +500,9 @@ export function useSayHello<
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
     TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
+  > & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
   query.queryKey = queryOptions.queryKey;
 

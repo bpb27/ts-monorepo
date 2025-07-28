@@ -5,11 +5,12 @@ import {
   PostgresDialect,
 } from 'kysely';
 import pg from 'pg';
+import type { DB } from './database-types.js';
 
 const plugins = [new CamelCasePlugin(), new ParseJSONResultsPlugin()];
 
 export const createDbPool = () =>
-  new Kysely({
+  new Kysely<DB>({
     dialect: new PostgresDialect({
       pool: new pg.Pool({
         connectionString: process.env.DATABASE_URL,

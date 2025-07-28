@@ -6,7 +6,9 @@
     "codegen": "tsx scripts/codegen.ts",
     "dev": "tsx watch --env-file=.env src/server.ts",
     "lint": "biome check",
-    "kysely": "kysely"
+    "kysely": "kysely",
+    "migrate:latest": "kysely migrate:latest && pnpm codegen",
+    "migrate:make": "kysely migrate:make"
   },
   "keywords": [],
   "author": "",

@@ -8,3 +8,5 @@ pnpm-debug.log*
 storybook-static
 .env
 .env.local
+PROJECTION.md
+TS-CASE.md

@@ -12,3 +12,10 @@ Create the database locally:
 psql postgres
 CREATE DATABASE ts-monorepo;
 ```
+
+Install dependencies and run codegen:
+
+```bash
+pnpm install
+pnpm codegen
+```

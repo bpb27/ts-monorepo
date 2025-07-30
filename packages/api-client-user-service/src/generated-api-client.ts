@@ -53,7 +53,7 @@ export const getSayHelloUserUrl = (languageCode: 'en' | 'fr' | 'es' | 'ge') => {
   return `http://localhost:3000/hello-user/${languageCode}`;
 };
 
-export const sayHelloUser = (
+export const sayHelloUser = async (
   languageCode: 'en' | 'fr' | 'es' | 'ge',
   options?: RequestInit
 ): Promise<SayHelloUser200> => {
@@ -99,9 +99,7 @@ export const getSayHelloUserQueryOptions = <
     Awaited<ReturnType<typeof sayHelloUser>>,
     TError,
     TData
-  > & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type SayHelloUserQueryResult = NonNullable<
@@ -191,9 +189,7 @@ export function useSayHelloUser<
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
     TError
-  > & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = queryOptions.queryKey;
 
@@ -207,7 +203,9 @@ export const getGetUsersUrl = () => {
   return 'http://localhost:3000/users';
 };
 
-export const getUsers = (options?: RequestInit): Promise<GetUsers200Item[]> => {
+export const getUsers = async (
+  options?: RequestInit
+): Promise<GetUsers200Item[]> => {
   return customFetch<GetUsers200Item[]>(getGetUsersUrl(), {
     ...options,
     method: 'GET',
@@ -325,9 +323,7 @@ export function useGetUsers<
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
     TError
-  > & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = queryOptions.queryKey;
 
@@ -356,7 +352,7 @@ export const getSayHelloUrl = (
     : `http://localhost:3000/hello/${languageCode}`;
 };
 
-export const sayHello = (
+export const sayHello = async (
   languageCode: 'en' | 'fr' | 'es' | 'ge',
   params: SayHelloParams,
   options?: RequestInit
@@ -500,9 +496,7 @@ export function useSayHello<
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
     TError
-  > & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = queryOptions.queryKey;
 

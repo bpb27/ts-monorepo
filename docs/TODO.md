@@ -1,0 +1,13 @@
+- Basic theme
+- Components - Input, Button, Form
+- React Router + Authed segments
+- Better Auth Admin + Organization plugins
+- Backend tests w/ DB
+- Seeds
+- Envs
+- Docker
+- CI
+- CD (Render?)
+- Sentry
+- OTEL
+- 401 handling (postMessage?)

@@ -1,44 +1,58 @@
-import { createSprinkles, defineProperties } from '@vanilla-extract/sprinkles';
+import { createSprinkles, defineProperties } from "@vanilla-extract/sprinkles";
+import { theme } from "./theme.css";
 
-const space = {
-  none: 0,
-  small: '4px',
-  medium: '8px',
-  large: '16px',
-};
+/*
+  This is a css utility function for creating styles on the fly,
+  while still adhering to the broader theme constraints.
+
+  It can be used in component css.ts files, or in regular .tsx files,
+  likely for divs and layouts.
+
+  Example: <div className={css({ display: 'flex', flexDirection: ['column', 'row'] })}/>
+*/
 
 const responsiveProperties = defineProperties({
-  conditions: {
-    mobile: {},
-    tablet: { '@media': 'screen and (min-width: 768px)' },
-    desktop: { '@media': 'screen and (min-width: 1024px)' },
-  },
-  defaultCondition: 'mobile',
-  properties: {
-    display: ['none', 'flex', 'block', 'inline'],
-    flexDirection: ['row', 'column'],
-    justifyContent: [
-      'stretch',
-      'flex-start',
-      'center',
-      'flex-end',
-      'space-around',
-      'space-between',
-    ],
-    alignItems: ['stretch', 'flex-start', 'center', 'flex-end'],
-    paddingTop: space,
-    paddingBottom: space,
-    paddingLeft: space,
-    paddingRight: space,
-    gap: space,
-    margin: space,
-  },
-  shorthands: {
-    padding: ['paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight'],
-    paddingX: ['paddingLeft', 'paddingRight'],
-    paddingY: ['paddingTop', 'paddingBottom'],
-    placeItems: ['justifyContent', 'alignItems'],
-  },
+	conditions: {
+		mobile: {},
+		tablet: { "@media": "screen and (min-width: 768px)" },
+		desktop: { "@media": "screen and (min-width: 1024px)" },
+	},
+	responsiveArray: ["mobile", "tablet", "desktop"],
+	defaultCondition: "mobile",
+	properties: {
+		display: ["none", "flex", "block", "inline"],
+		flexDirection: ["row", "column"],
+		justifyContent: ["stretch", "flex-start", "center", "flex-end", "space-around", "space-between"],
+		alignItems: ["stretch", "flex-start", "center", "flex-end"],
+		margin: theme.spacing,
+		marginBottom: theme.spacing,
+		marginLeft: theme.spacing,
+		marginRight: theme.spacing,
+		marginTop: theme.spacing,
+		padding: theme.spacing,
+		paddingBottom: theme.spacing,
+		paddingLeft: theme.spacing,
+		paddingRight: theme.spacing,
+		paddingTop: theme.spacing,
+		gap: theme.spacing,
+	},
+	// these reference properties above
+	shorthands: {
+		p: ["padding"],
+		pt: ["paddingTop"],
+		pr: ["paddingRight"],
+		pb: ["paddingBottom"],
+		pl: ["paddingLeft"],
+		px: ["paddingLeft", "paddingRight"],
+		py: ["paddingTop", "paddingBottom"],
+		m: ["margin"],
+		mt: ["marginTop"],
+		mr: ["marginRight"],
+		mb: ["marginBottom"],
+		ml: ["marginLeft"],
+		mx: ["marginLeft", "marginRight"],
+		my: ["marginTop", "marginBottom"],
+	},
 });
 
 export const sprinkles = createSprinkles(responsiveProperties);

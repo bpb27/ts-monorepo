@@ -1,3 +1,5 @@
+## Libraries
+
 - Better Auth (authentication + authorization)
 - Biome (linting + formatting)
 - Fastify (backend framework)

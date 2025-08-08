@@ -1,0 +1,53 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "codegen": {
+      "outputs": [],
+      "dependsOn": ["^codegen"]
+    },
+    "codegen:auth-service": {
+      "outputs": ["generated-api-spec.json"]
+    },
+    "codegen:admin-backend": {
+      "outputs": ["generated-api-spec.json"]
+    },
+    "codegen:user-backend": {
+      "outputs": ["generated-api-spec.json"]
+    },
+    "codegen:api-client-auth": {
+      "dependsOn": ["@repo/auth-service#codegen:auth-service"],
+      "inputs": ["../../apps/auth-service/generated-api-spec.json"],
+      "outputs": ["src/generated-api-client.ts"]
+    },
+    "codegen:api-client-admin": {
+      "dependsOn": ["@repo/admin-backend#codegen:admin-backend"],
+      "inputs": ["../../apps/admin-backend/generated-api-spec.json"],
+      "outputs": ["src/generated-api-client.ts"]
+    },
+    "codegen:api-client-user": {
+      "dependsOn": ["@repo/user-backend#codegen:user-backend"],
+      "inputs": ["../../apps/user-backend/generated-api-spec.json"],
+      "outputs": ["src/generated-api-client.ts"]
+    },
+    "migrate:latest": {
+      "dependsOn": ["^migrate:latest"]
+    },
+    "build": {
+      "dependsOn": ["^build", "^codegen"],
+      "inputs": ["$TURBO_DEFAULTS", ".env*"],
+      "outputs": ["dist/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint", "^codegen"]
+    },
+    "test": {
+      "dependsOn": ["^test", "^codegen"]
+    },
+    "dev": {
+      "dependsOn": ["^codegen"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

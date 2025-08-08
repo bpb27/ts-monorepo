@@ -1,0 +1,20 @@
+{
+  "name": "@repo/api-client-user",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "codegen": "orval",
+    "dev": "orval -w",
+    "lint": "biome check"
+  },
+  "devDependencies": {
+    "@tanstack/react-query": "^5.83.0",
+    "@tsconfig/vite-react": "^7.0.0",
+    "orval": "^7.10.0"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.83.0"
+  }
+}

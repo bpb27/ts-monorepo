@@ -1,0 +1,12 @@
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      run: |
+        if [ -z "{staged_files}" ]; then
+          exit 0
+        fi
+        pnpm biome check --fix --unsafe {staged_files}
+      stage_fixed: true
+      include: '**/*.{js,ts,tsx,json,css,md}'
+      exclude: 'lefthook.yml'

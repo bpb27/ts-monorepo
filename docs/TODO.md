@@ -1,0 +1,10 @@
+- Envs
+- Docker
+- CI
+- Better Auth admin
+- Better Auth organization + permissions
+- Backend tests w/ DB
+- Seeds
+- Sentry
+- OTEL
+- 401 handling (postMessage or QueryClient)

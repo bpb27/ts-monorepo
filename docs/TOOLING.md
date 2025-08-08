@@ -1,0 +1,17 @@
+## Libraries
+
+- Better Auth (authentication + authorization)
+- Biome (linting + formatting)
+- Fastify (backend framework)
+- Kysely (query building)
+- Orval (API client generation)
+- PNPM (package manager)
+- React (frontend framework)
+- React Query (data fetching)
+- React Router (client routing)
+- Storybook (component playground)
+- TurboRepo (monorepo tooling)
+- Vanilla Extract (styling)
+- Vite (frontend build tool)
+- Vitest (testing)
+- Zod (schema validation)

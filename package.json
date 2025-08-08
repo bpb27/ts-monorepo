@@ -1,0 +1,29 @@
+{
+  "name": "ts-monorepo",
+  "private": true,
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "fix": "biome check --fix --unsafe && pnpm dlx sherif@latest -f",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "codegen": "turbo run codegen",
+    "migrate:latest": "turbo run migrate:latest",
+    "clean": "rm -rf node_modules .turbo apps/*/node_modules apps/*/.turbo packages/*/node_modules packages/*/.turbo"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.2",
+    "lefthook": "^1.12.2",
+    "turbo": "^2.5.5",
+    "typescript": "^5.8.3",
+    "ultracite": "5.0.39"
+  }
+}
